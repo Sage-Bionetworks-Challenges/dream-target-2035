@@ -1,70 +1,31 @@
-# Data-to-Model Workflow
-This repository will serve as a template for the `CWL` workflow and tools required to set up a `data-to-model` challenge infrastructure.
+# DREAM Target 2035 Drug Discovery Challenges evaluation
 
-For more information about the tools, refer to [ChallengeWorkflowTemplates](https://github.com/Sage-Bionetworks/ChallengeWorkflowTemplates).
+The repository contains the evaluation workflow for the first [DREAM Target 2035 Drug Discovery Challenge].
+[Target 2035] is an open-science global movement consisting of international scientists
+and researchers, focusing on the creation of chemical and biological tools to study
+human proteins and inform drug discovery.
 
-## Workflow Steps
+The success of Target 2035 relies on future breakthroughs in machine learning (ML) for
+drug discovery. To that end, the SGC and its industry partners are populating the AIRCHECK
+platform with training data and (soon) best performing ML models.
 
-**Step** | **Description** 
---|--
-`download_submission` | Downloads the predictions file.
-`download_goldstandard` | Downloads the goldstandard file.
-`validate` | Validates the predictions file.
-`email_validation` | Sends an email notification to the partipant/team of the validation results. By default, an email will only be sent if there are errors.
-`annotate_validation_with_output` | Updates the submission status (`VALIDATED` if valid, else `INVALID`).
-`check_status` | Checks the submission status. If the status is `INVALID`, halt the workflow.
-`score` | Scores the predictions file.
-`email_score` | Sends an email notification to the participant/team of the scoring results. By default, all scores are sent.
-`annotate_submission_with_output` | Updates the submission status (`SCORED` if successful, else `INVALID`)
+## Evaluation Overview
 
-## Usage
+The challenge is split into 3 "steps":
 
-### Requirements
-* `pip3 install cwltool`
-* A Synapse account/configuration file.  Learn more [here](https://docs.synapse.org/articles/client_configuration.html#for-developers)
-* A Synapse Submission object ID.  Learn more [here](https://docs.synapse.org/articles/evaluation_queues.html#submissions)
+- **Step 1**: participants submit a 4-column CSV file
+- **Step 2**: participants submit a 4-column CSV file
+- **Step 3**: top 5 teams from Step 1 and top 20-25 teams
+  from Step 2 are invited to participate in Step 3 (more details coming soon)
 
+Metrics returned and used for ranking are:
 
-### Configurations
-**workflow.cwl** 
+_TBA_
 
-**Step** | **Description** | **Required?** | **Example**
---|--|--|--
-`download_goldstandard` | Update `synapseid` to the Synapse ID of the challenge's goldstandard | Yes | `valueFrom: "syn12345678"`
-`email_validation` | Set `errors_only` to `false` if an email notification about a valid submission should also be sent | No | `default: false`
-`email_score` | Add metrics and scores to `private_annotations` if they are to be withheld from the participants | No | `default: [primary_metric, primary_metric_value]`
+## Evaluation Scripts
 
-**validate.cwl**
+Scripts for validation and scoring are vailable under `./evaluation`
 
-**Line** | **Description** | **Required?** | **Example**
---|--|--|--
-`dockerPull: python:3.8.8-slim-buster` | Update the base image if the validation code is not Python | If code is not Python, yes | ` dockerPull: rocker/r-base:4.0.4`
-`entry: \| [validation code]` | Remove the sample validation code and replace with validation code for the Challenge | Yes | --
-
-* **NOTE:** expected annotations to write out are `submission_status` and `submission_errors`.
-
-**score.cwl**
-
-**Line** | **Description** | **Required?** | **Example**
---|--|--|--
-`dockerPull: python:3.8.8-slim-buster` | Update the base image if the validation code is not Python | If code is not Python, yes | ` dockerPull: rocker/r-base:4.0.4`
-`entry: \| [scoring code]` | Remove the sample scoring code and replace with scoring code for the Challenge | Yes | --
-
-* **NOTE:** expected annotations to write out are `primary_metric`, `primary_metric_value`, and `submission_status`. If there is a secondary (tie-breaking) metric, include the `secondary_metric` and `secondary_metric_value` annotations as well.
-
-
-### Example Run
-
-```bash
-cwltool workflow.cwl --submissionId 12345 \
-                     --adminUploadSynId syn123 \
-                     --submitterUploadSynId syn456 \
-                     --workflowSynapseId syn789 \
-                     --synaspeConfig ~/.synapseConfig
-```
-where:
-* `submissionId`: Submission ID to run this workflow on
-* `adminUploadSynId`: Synapse ID of Folder accessible by admin user/team
-* `submitterUploadSynId`: Synapse ID of Folder accessible by submitter
-* `workflowSynapseId`: Synapse ID of File that links to workflow archive
-* `synapseConfig`: filepath to .synapseConfig file
+<!-- LINKS -->
+[DREAM Target 2035 Drug Discovery Challenge]: https://www.synapse.org/dream_target_2035
+[Target 2035]: https://target2035.net/
