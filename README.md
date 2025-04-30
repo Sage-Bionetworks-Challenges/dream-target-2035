@@ -20,7 +20,14 @@ The challenge is split into 3 "steps":
 
 Metrics returned and used for ranking are:
 
-_TBA_
+- Number of clusters per selection label
+- Number of hits per selection label
+- Cluster PR-AUC per selection label
+
+Additional metrics returned but not used for ranking:
+
+- AUROC
+- AUC-PR
 
 ## Evaluation Scripts
 
