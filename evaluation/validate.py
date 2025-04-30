@@ -11,7 +11,7 @@ from cnb_tools import validation_toolkit as vtk
 from typing_extensions import Annotated
 
 INDEX = "RandomID"
-COLS = [
+EXPECTED_COLS = [
     "RandomID",
     "Sel_200",
     "Sel_500",
@@ -38,14 +38,14 @@ def validate(gt_file, pred_file):
         pred = (
             pd.read_csv(
                 pred_file,
-                usecols=COLS,
+                usecols=EXPECTED_COLS,
                 float_precision="round_trip",
             )
             .set_index(INDEX)
             .fillna({"Score": 0.0, "Sel_200": 0, "Sel_500": 0})
         )
     except ValueError:
-        errors.append(f"Invalid headers in prediction file. Expecting: {COLS}")
+        errors.append(f"Invalid headers in prediction file. Expecting: {EXPECTED_COLS}")
     else:
         errors.append(vtk.check_duplicate_keys(pred.index))
         # errors.append(vtk.check_missing_keys(truth.index, pred.index))
