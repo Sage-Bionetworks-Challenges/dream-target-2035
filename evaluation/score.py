@@ -66,11 +66,11 @@ def main(
         scores = {}
         errors = "Error encountered during scoring; submission not evaluated."
 
-    res = {
+    res = json.dumps({
         "submission_status": "INVALID" if errors else "SCORED",
         "submission_errors": errors,
         **scores
-    }
+    })
 
     if output_file:
         with open(output_file, "w") as out:
