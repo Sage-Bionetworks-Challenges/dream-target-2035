@@ -166,9 +166,8 @@ steps:
         source: "#synapseConfig"
       - id: results
         source: "#08_score/results"
-      # OPTIONAL: add annotations to be withheld from participants to `[]`
-      # - id: private_annotations
-      #   default: []
+      - id: private_annotations
+        default: ["submission_errors"]
     out: []
 
   10_add_score_annots:
