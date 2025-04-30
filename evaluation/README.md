@@ -5,6 +5,9 @@ Metrics returned and used for ranking are:
 - Number of clusters per selection label
 - Number of hits per selection label
 - Cluster PR-AUC per selection label
+
+Additional metrics returned but not used for ranking:
+
 - AUROC
 - AUC-PR
 
@@ -18,7 +21,10 @@ python validate.py -p PATH/TO/PREDICTIONS_FILE.CSV -g PATH/TO/GROUNDTRUTH_FILE.C
 If `-o/--output` is not provided, then results will print to STDOUT, e.g.
 
 ```json
-{"submission_status": "VALIDATED", "submission_errors": ""}
+{
+    "submission_status": "VALIDATED",
+    "submission_errors": ""
+}
 ```
 
 What it will check for:
