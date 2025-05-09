@@ -167,7 +167,7 @@ steps:
       - id: results
         source: "#08_score/results"
       - id: private_annotations
-        default: ["submission_errors"]
+        default: ["submission_errors","Clusters_Sel_200", "Clusters_Sel_500", "Hits_Sel_200", "Hits_Sel_500", "ClusterPRAUC_Sel_200", "ClusterPRAUC_Sel_500", "ROCAUC", "PRAUC"]
     out: []
 
   10_add_score_annots:
