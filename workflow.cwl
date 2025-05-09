@@ -62,26 +62,35 @@ steps:
       - id: evaluation_id
       - id: results
 
-  03_download_groundtruth:
+  03_get_task_entities:
+    doc: Get goldstandard and label based on task number
+    run: steps/get_task.cwl
+    in:
+      - id: queue
+        source: "#02_download_submission/evaluation_id"
+    out:
+      - id: synid
+
+  04_download_groundtruth:
     doc: Download goldstandard file(s)
     run: |-
       https://raw.githubusercontent.com/Sage-Bionetworks-Workflows/cwl-tool-synapseclient/v1.4/cwl/synapse-get-tool.cwl
     in:
       - id: synapseid
-        valueFrom: "syn66503497"
+        source: "#03_get_task_entities/synid"
       - id: synapse_config
         source: "#synapseConfig"
     out:
       - id: filepath
 
-  04_validate:
+  05_validate:
     doc: Validate predictions file
     run: steps/validate.cwl
     in:
       - id: input_file
         source: "#02_download_submission/filepath"
       - id: groundtruth
-        source: "#03_download_groundtruth/filepath"
+        source: "#04_download_groundtruth/filepath"
       - id: entity_type
         source: "#02_download_submission/entity_type"
     out:
@@ -89,7 +98,7 @@ steps:
       - id: status
       - id: invalid_reasons
   
-  05_send_validation_results:
+  06_send_validation_results:
     doc: Send email of the validation results to the submitter
     run: |-
       https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v4.1/cwl/validate_email.cwl
@@ -99,15 +108,15 @@ steps:
       - id: synapse_config
         source: "#synapseConfig"
       - id: status
-        source: "#04_validate/status"
+        source: "#05_validate/status"
       - id: invalid_reasons
-        source: "#04_validate/invalid_reasons"
+        source: "#05_validate/invalid_reasons"
       # OPTIONAL: set `default` to `false` if email notification about valid submission is needed
       - id: errors_only
         default: true
     out: [finished]
 
-  06_add_status_annots:
+  07_add_status_annots:
     doc: >
       Add `submission_status` and `submission_errors` annotations to the
       submission
@@ -117,7 +126,7 @@ steps:
       - id: submissionid
         source: "#submissionId"
       - id: annotation_values
-        source: "#04_validate/results"
+        source: "#05_validate/results"
       - id: to_public
         default: true
       - id: force
@@ -126,7 +135,7 @@ steps:
         source: "#synapseConfig"
     out: [finished]
 
-  07_check_status:
+  08_check_status:
     doc: >
       Check the validation status of the submission; if 'INVALID', throw an
       exception to stop the workflow - this will prevent the attempt of
@@ -135,27 +144,27 @@ steps:
       https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v4.1/cwl/check_status.cwl
     in:
       - id: status
-        source: "#04_validate/status"
+        source: "#05_validate/status"
       - id: previous_annotation_finished
-        source: "#06_add_status_annots/finished"
+        source: "#07_add_status_annots/finished"
       - id: previous_email_finished
-        source: "#05_send_validation_results/finished"
+        source: "#06_send_validation_results/finished"
     out: [finished]
 
-  08_score:
+  09_score:
     doc: Score generated predictions file
     run: steps/score.cwl
     in:
       - id: input_file
         source: "#02_download_submission/filepath"
       - id: groundtruth
-        source: "#03_download_groundtruth/filepath"
+        source: "#04_download_groundtruth/filepath"
       - id: check_validation_finished 
-        source: "#07_check_status/finished"
+        source: "#08_check_status/finished"
     out:
       - id: results
       
-  09_send_score_results:
+  10_send_score_results:
     doc: Send email of the scores to the submitter
     run: |-
       https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v4.1/cwl/score_email.cwl
@@ -165,12 +174,12 @@ steps:
       - id: synapse_config
         source: "#synapseConfig"
       - id: results
-        source: "#08_score/results"
+        source: "#09_score/results"
       - id: private_annotations
         default: ["submission_errors","Clusters_Sel_200", "Clusters_Sel_500", "Hits_Sel_200", "Hits_Sel_500", "ClusterPRAUC_Sel_200", "ClusterPRAUC_Sel_500", "ROCAUC", "PRAUC"]
     out: []
 
-  10_add_score_annots:
+  11_add_score_annots:
     doc: >
       Update `submission_status` and add the scoring metric annotations
     run: |-
@@ -179,7 +188,7 @@ steps:
       - id: submissionid
         source: "#submissionId"
       - id: annotation_values
-        source: "#08_score/results"
+        source: "#09_score/results"
       - id: to_public
         default: true
       - id: force
@@ -187,7 +196,7 @@ steps:
       - id: synapse_config
         source: "#synapseConfig"
       - id: previous_annotation_finished
-        source: "#06_add_status_annots/finished"
+        source: "#07_add_status_annots/finished"
     out: [finished]
  
 s:author:
