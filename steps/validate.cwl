@@ -53,7 +53,7 @@ s:author:
   s:email: verena.chung@sagebase.org
   s:name: Verena Chung
 
-s:codeRepository: https://github.com/Sage-Bionetworks-Challenges/olfactory-mixtures-prediction
+s:codeRepository: https://github.com/Sage-Bionetworks-Challenges/dream-target-2035
 s:license: https://spdx.org/licenses/Apache-2.0
 
 $namespaces:
