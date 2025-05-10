@@ -20,11 +20,11 @@ EXPECTED_COLS = [
 
 
 def check_labels(col: pd.Series, max_count: int) -> str:
-    if col.isin([0, 1]).all():
-        if col.value_counts()[1] <= max_count:
-            return ""
+    if not col.isin([0, 1]).all():
+        return f"'{col.name}' values should only be 0 or 1."
+    if (col == 1).sum() > max_count:
         return f"'{col.name}' contains more than {max_count} `1` labels."
-    return f"'{col.name}' values should only be 0 or 1."
+    return ""
 
 
 def validate(gt_file, pred_file):
