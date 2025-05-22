@@ -86,7 +86,7 @@ def evaluate_team_model(gold_df, team_df,
         results[f"Clusters_{label_team}"] = n_clusters
         results[f"Hits_{label_team}"] = n_hits
         results[f"ClusterPRAUC_{label_team}"] = cluster_prauc
-        results[f"P-value_{label_team}"] = p_value
+        results[f"P_value_{label_team}"] = p_value
 
     return results
 
