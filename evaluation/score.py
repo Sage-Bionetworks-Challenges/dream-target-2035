@@ -62,6 +62,12 @@ def main(
     try:
         scores = evaluation_function.evaluate_team_model(truth, pred)
         errors = ""
+
+        # Handle edge-case when ROC-AUC and PRAUC cannot be calculated and returns `nan`.
+        scores = {
+            metric: (None if pd.isnull(score) else score)
+            for metric, score in scores.items()
+        }
     except ValueError:
         scores = {}
         errors = "Error encountered during scoring; submission not evaluated."
