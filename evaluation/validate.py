@@ -66,14 +66,6 @@ def validate(gt_file, pred_file, task_number):
 
 
 def main(
-    predictions_file: Annotated[
-        str,
-        typer.Option(
-            "-p",
-            "--predictions_file",
-            help="Path to the prediction file.",
-        ),
-    ],
     groundtruth_file: Annotated[
         str,
         typer.Option(
@@ -90,6 +82,14 @@ def main(
             help="Entity type of submission.",
         ),
     ],
+    predictions_file: Annotated[
+        str,
+        typer.Option(
+            "-p",
+            "--predictions_file",
+            help="Path to the prediction file.",
+        ),
+    ] = None,
     output_file: Annotated[
         str,
         typer.Option(
