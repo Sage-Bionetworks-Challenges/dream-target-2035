@@ -8,7 +8,7 @@ requirements:
 
 inputs:
 - id: input_file
-  type: File
+  type: File?
 - id: groundtruth
   type: File
 - id: entity_type
