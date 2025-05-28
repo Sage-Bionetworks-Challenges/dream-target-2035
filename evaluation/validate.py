@@ -11,11 +11,16 @@ from cnb_tools import validation_toolkit as vtk
 from typing_extensions import Annotated
 
 INDEX = "RandomID"
+# EXPECTED_COLS = [
+#     "RandomID",
+#     "Sel_200",
+#     "Sel_500",
+#     "Score",
+# ]
 EXPECTED_COLS = [
     "RandomID",
-    "Sel_200",
-    "Sel_500",
-    "Score",
+    "Sel_50",
+    "Score"
 ]
 
 
@@ -42,7 +47,7 @@ def validate(gt_file, pred_file):
                 float_precision="round_trip",
             )
             .set_index(INDEX)
-            .fillna({"Score": 0.0, "Sel_200": 0, "Sel_500": 0})
+            .fillna({"Score": 0.0, "Sel_200": 0, "Sel_500": 0, "Sel_50": 0})
         )
     except ValueError:
         errors.append(f"Invalid headers in prediction file. Expecting: {EXPECTED_COLS}")
@@ -57,8 +62,9 @@ def validate(gt_file, pred_file):
                 max_val=1,
             )
         )
-        errors.append(check_labels(pred["Sel_200"], max_count=200))
-        errors.append(check_labels(pred["Sel_500"], max_count=500))
+        # errors.append(check_labels(pred["Sel_200"], max_count=200))
+        # errors.append(check_labels(pred["Sel_500"], max_count=500))
+        errors.append(check_labels(pred["Sel_50"], max_count=50))
     return errors
 
 

@@ -10,18 +10,18 @@ Steps 1 and 2 will return the same metrics:
 """
 import json
 
+import evaluation_function
 import pandas as pd
 import typer
 from typing_extensions import Annotated
 
-import evaluation_function
-
-PREDICTION_COLS = [
-    "RandomID",
-    "Sel_200",
-    "Sel_500",
-    "Score",
-]
+# PREDICTION_COLS = [
+#     "RandomID",
+#     "Sel_200",
+#     "Sel_500",
+#     "Score",
+# ]
+PREDICTION_COLS = ["RandomID", "Sel_50", "Score"]
 
 
 def main(
@@ -56,11 +56,13 @@ def main(
         predictions_file,
         usecols=PREDICTION_COLS,
         float_precision="round_trip",
-    ).fillna({"Score": 0.0, "Sel_200": 0, "Sel_500": 0})
+    ).fillna({"Score": 0.0, "Sel_200": 0, "Sel_500": 0, "Sel_50": 0})
     truth = pd.read_csv(groundtruth_file)
 
     try:
-        scores = evaluation_function.evaluate_team_model(truth, pred)
+        scores = evaluation_function.evaluate_team_model(
+            truth, pred, labels_team=["Sel_50"]
+        )
         errors = ""
 
         # Handle edge-case when ROC-AUC and PRAUC cannot be calculated and returns `nan`.
@@ -72,11 +74,13 @@ def main(
         scores = {}
         errors = "Error encountered during scoring; submission not evaluated."
 
-    res = json.dumps({
-        "submission_status": "INVALID" if errors else "SCORED",
-        "submission_errors": errors,
-        **scores
-    })
+    res = json.dumps(
+        {
+            "submission_status": "INVALID" if errors else "SCORED",
+            "submission_errors": errors,
+            **scores,
+        }
+    )
 
     if output_file:
         with open(output_file, "w") as out:
