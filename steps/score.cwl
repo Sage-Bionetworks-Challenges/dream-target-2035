@@ -11,6 +11,8 @@ inputs:
   type: File
 - id: groundtruth
   type: File
+- id: task_number
+  type: int
 - id: check_validation_finished
   type: boolean?
 
@@ -34,6 +36,8 @@ arguments:
   valueFrom: $(inputs.groundtruth.path)
 - prefix: -o
   valueFrom: results.json
+- prefix: -t
+  valueFrom: $(inputs.task_number)
 
 hints:
   DockerRequirement:

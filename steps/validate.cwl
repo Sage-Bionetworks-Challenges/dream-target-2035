@@ -13,6 +13,8 @@ inputs:
   type: File
 - id: entity_type
   type: string
+- id: task_number
+  type: int
 
 outputs:
 - id: results
@@ -42,6 +44,8 @@ arguments:
   valueFrom: $(inputs.entity_type)
 - prefix: -o
   valueFrom: results.json
+- prefix: -t
+  valueFrom: $(inputs.task_number)
 
 hints:
   DockerRequirement:

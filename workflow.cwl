@@ -70,6 +70,8 @@ steps:
         source: "#02_download_submission/evaluation_id"
     out:
       - id: synid
+      - id: task_number
+      - id: hidden_annots
 
   04_download_groundtruth:
     doc: Download goldstandard file(s)
@@ -93,6 +95,8 @@ steps:
         source: "#04_download_groundtruth/filepath"
       - id: entity_type
         source: "#02_download_submission/entity_type"
+      - id: task_number
+        source: "#03_get_task_entities/task_number"
     out:
       - id: results
       - id: status
@@ -159,6 +163,8 @@ steps:
         source: "#02_download_submission/filepath"
       - id: groundtruth
         source: "#04_download_groundtruth/filepath"
+      - id: task_number
+        source: "#03_get_task_entities/task_number"
       - id: check_validation_finished 
         source: "#08_check_status/finished"
     out:
@@ -176,7 +182,7 @@ steps:
       - id: results
         source: "#09_score/results"
       - id: private_annotations
-        default: ["submission_errors","Clusters_Sel_200", "Clusters_Sel_500", "Hits_Sel_200", "Hits_Sel_500", "ClusterPRAUC_Sel_200", "ClusterPRAUC_Sel_500", "ROCAUC", "PRAUC", "P_value_Sel_200", "P_value_Sel_500"]
+        source: "#03_get_task_entities/hidden_annots"
     out: []
 
   11_add_score_annots:
