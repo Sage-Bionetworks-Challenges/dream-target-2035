@@ -11,17 +11,10 @@ from cnb_tools import validation_toolkit as vtk
 from typing_extensions import Annotated
 
 INDEX = "RandomID"
-# EXPECTED_COLS = [
-#     "RandomID",
-#     "Sel_200",
-#     "Sel_500",
-#     "Score",
-# ]
-EXPECTED_COLS = [
-    "RandomID",
-    "Sel_50",
-    "Score"
-]
+EXPECTED_COLS = {
+    1: ["RandomID", "Sel_200", "Sel_500", "Score"],
+    2: ["RandomID", "Sel_50", "Score"],
+}
 
 
 def check_labels(col: pd.Series, max_count: int) -> str:
@@ -32,7 +25,7 @@ def check_labels(col: pd.Series, max_count: int) -> str:
     return ""
 
 
-def validate(gt_file, pred_file):
+def validate(gt_file, pred_file, task_number):
     """Validate predictions file against goldstandard."""
     errors = []
     truth = pd.read_csv(
@@ -43,14 +36,16 @@ def validate(gt_file, pred_file):
         pred = (
             pd.read_csv(
                 pred_file,
-                usecols=EXPECTED_COLS,
+                usecols=EXPECTED_COLS.get(task_number),
                 float_precision="round_trip",
             )
             .set_index(INDEX)
             .fillna({"Score": 0.0, "Sel_200": 0, "Sel_500": 0, "Sel_50": 0})
         )
     except ValueError:
-        errors.append(f"Invalid headers in prediction file. Expecting: {EXPECTED_COLS}")
+        errors.append(
+            f"Invalid headers in prediction file. Expecting: {EXPECTED_COLS.get(task_number)}"
+        )
     else:
         errors.append(vtk.check_duplicate_keys(pred.index))
         # errors.append(vtk.check_missing_keys(truth.index, pred.index))
@@ -62,9 +57,11 @@ def validate(gt_file, pred_file):
                 max_val=1,
             )
         )
-        # errors.append(check_labels(pred["Sel_200"], max_count=200))
-        # errors.append(check_labels(pred["Sel_500"], max_count=500))
-        errors.append(check_labels(pred["Sel_50"], max_count=50))
+        if task_number == 1:
+            errors.append(check_labels(pred["Sel_200"], max_count=200))
+            errors.append(check_labels(pred["Sel_500"], max_count=500))
+        elif task_number == 2:
+            errors.append(check_labels(pred["Sel_50"], max_count=50))
     return errors
 
 
@@ -101,6 +98,14 @@ def main(
             help="Path to save the results JSON file.",
         ),
     ] = None,
+    task_number: Annotated[
+        int,
+        typer.Option(
+            "-t",
+            "--task_number",
+            help="Challenge task number",
+        ),
+    ] = 1,
 ):
     """Main function."""
     entity_type = entity_type.split(".")[-1]
@@ -108,7 +113,11 @@ def main(
     if entity_type != "FileEntity":
         errors = [f"Submission must be a File, not {entity_type}."]
     else:
-        errors = validate(gt_file=groundtruth_file, pred_file=predictions_file)
+        errors = validate(
+            gt_file=groundtruth_file,
+            pred_file=predictions_file,
+            task_number=task_number,
+        )
 
     invalid_reasons = "\n".join(filter(None, errors))
     status = "INVALID" if invalid_reasons else "VALIDATED"

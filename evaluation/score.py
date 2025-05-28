@@ -15,13 +15,10 @@ import pandas as pd
 import typer
 from typing_extensions import Annotated
 
-# PREDICTION_COLS = [
-#     "RandomID",
-#     "Sel_200",
-#     "Sel_500",
-#     "Score",
-# ]
-PREDICTION_COLS = ["RandomID", "Sel_50", "Score"]
+PREDICTION_COLS = {
+    1: ["RandomID", "Sel_200", "Sel_500", "Score"],
+    2: ["RandomID", "Sel_50", "Score"],
+}
 
 
 def main(
@@ -49,21 +46,33 @@ def main(
             help="Path to save the results JSON file.",
         ),
     ] = None,
+    task_number: Annotated[
+        int,
+        typer.Option(
+            "-t",
+            "--task_number",
+            help="Challenge task number",
+        ),
+    ] = 1,
 ):
     """Main function."""
 
     pred = pd.read_csv(
         predictions_file,
-        usecols=PREDICTION_COLS,
+        usecols=PREDICTION_COLS.get(task_number),
         float_precision="round_trip",
     ).fillna({"Score": 0.0, "Sel_200": 0, "Sel_500": 0, "Sel_50": 0})
     truth = pd.read_csv(groundtruth_file)
 
     try:
-        scores = evaluation_function.evaluate_team_model(
-            truth, pred, labels_team=["Sel_50"]
-        )
+        scores = {}
         errors = ""
+        if task_number == 1:
+            scores = evaluation_function.evaluate_team_model(truth, pred)
+        elif task_number == 2:
+            scores = evaluation_function.evaluate_team_model(
+                truth, pred, labels_team=["Sel_50"]
+            )
 
         # Handle edge-case when ROC-AUC and PRAUC cannot be calculated and returns `nan`.
         scores = {
