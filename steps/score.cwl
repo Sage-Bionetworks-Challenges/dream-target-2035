@@ -41,7 +41,7 @@ arguments:
 
 hints:
   DockerRequirement:
-    dockerPull: docker.synapse.org/syn65660836/evaluation:v1.1.0
+    dockerPull: docker.synapse.org/syn65660836/evaluation:v2.0.0
 
 s:author:
 - class: s:Person
