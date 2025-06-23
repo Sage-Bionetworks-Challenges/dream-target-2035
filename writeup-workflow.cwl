@@ -39,7 +39,7 @@ steps:
       - id: submissionid
         source: "#submissionId"
       - id: challengewiki
-        valueFrom: "syn53470621"
+        valueFrom: "syn65660836"
       - id: public
         default: true
       - id: admin
