@@ -52,7 +52,7 @@ def validate(gt_file, pred_file, task_number):
         errors.append(vtk.check_unknown_keys(truth.index, pred.index))
         errors.append(
             vtk.check_values_range(
-                pred["Score"],
+                pd.to_numeric(pred["Score"], errors='coerce'),
                 min_val=0,
                 max_val=1,
             )
