@@ -1,6 +1,7 @@
-# DREAM Target 2035 Drug Discovery Challenges evaluation
+# DREAM x CACHE Target 2035 Drug Discovery Challenges evaluation
 
-The repository contains the evaluation workflow for the first [DREAM Target 2035 Drug Discovery Challenge].
+The repository contains the evaluation workflow for the DREAM Target 2035 Drug Discovery Challenge series. This year's challenge is the [DREAM x CACHE Target 2035 Drug Discovery Challenge].
+
 [Target 2035] is an open-science global movement consisting of international scientists
 and researchers, focusing on the creation of chemical and biological tools to study
 human proteins and inform drug discovery.
@@ -11,11 +12,11 @@ platform with training data and (soon) best performing ML models.
 
 ## Evaluation Overview
 
-The challenge is split into 3 "steps":
+The challenge is split into 4 "steps":
 
-- **Step 1**: participants submit a 4-column CSV file
-- **Step 2**: participants submit a 4-column CSV file
-- **Step 3**: top 5 teams from Step 1 and top 20-25 teams
+- **Blind validation**: participants submit a text file containing the CatalogID of their identified hit candidates, one candidate per line
+- **Blind test**: participants submit a 3-column CSV file, predicting the true positives in the test set
+- **Active learning**: top 5 teams from Step 1 and top 20-25 teams
   from Step 2 are invited to participate in Step 3 (more details coming soon)
 
 Metrics returned and used for ranking are:
@@ -34,5 +35,5 @@ Additional metrics returned but not used for ranking:
 Scripts for validation and scoring are vailable under `./evaluation`
 
 <!-- LINKS -->
-[DREAM Target 2035 Drug Discovery Challenge]: https://www.synapse.org/dream_target_2035
+[DREAM x CACHE Target 2035 Drug Discovery Challenge]: https://www.synapse.org/Synapse:syn75349604/wiki/641045
 [Target 2035]: https://target2035.net/
