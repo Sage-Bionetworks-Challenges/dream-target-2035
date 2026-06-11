@@ -129,7 +129,7 @@ steps:
         source: "#05_score/results"
       - id: private_annotations
         source: "#private_annotations"
-    out: []
+    out: [finished]
 
   06_add_score_annots:
     doc: >
