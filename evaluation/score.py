@@ -16,10 +16,32 @@ import pandas as pd
 import typer
 from typing_extensions import Annotated
 
-PREDICTION_COLS = {
-    1: ["RandomID", "Sel_200", "Sel_500", "Score"],
-    2: ["RandomID", "Sel_50", "Score"],
-}
+
+def load_task1(predictions_file: str) -> list:
+    with open(predictions_file, "r") as f:
+        return f.read().splitlines()
+
+
+def load_task2(predictions_file: str) -> tuple:
+    pred = pd.read_csv(
+        predictions_file,
+        usecols=["CatalogID", "Sel_50", "Score"],
+        float_precision="round_trip",
+    )
+    hits = pred.query("Sel_50 == 1")["CatalogID"].to_list()
+    return hits, pred["CatalogID"].to_list(), pred["Score"].to_list()
+
+
+def score_task1(evaluator: Evaluator, hits: list) -> dict:
+    return evaluator.evaluate_hits(hits)
+
+
+def score_task2(
+    evaluator: Evaluator, hits: list, catalog_ids: list, scores_col: list
+) -> dict:
+    scores = evaluator.evaluate_hits(hits)
+    ranking = evaluator.evaluate_ranking(catalog_ids, scores_col)
+    return {**scores, **ranking}
 
 
 def main(
@@ -66,6 +88,13 @@ def main(
 ):
     """Main function."""
         evaluator = Evaluator(reference_file, groundtruth_file)
+
+        if task_number == 1:
+            hits = load_task1(predictions_file)
+            scores = score_task1(evaluator, hits)
+        else:
+            hits, catalog_ids, scores_col = load_task2(predictions_file)
+            scores = score_task2(evaluator, hits, catalog_ids, scores_col)
 
         # Handle edge-case when ROC-AUC and PRAUC cannot be calculated and returns `nan`.
         scores = {
