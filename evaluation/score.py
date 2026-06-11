@@ -107,9 +107,9 @@ def main(
     except KeyError as e:
         scores = {}
         errors = f"Missing required column in predictions file: {e}. Expected columns: CatalogID, Sel_50, Score"
-    except ValueError:
+    except ValueError as e:
         scores = {}
-        errors = "Error encountered during scoring; submission not evaluated."
+        errors = str(e)
 
     res = json.dumps(
         {
