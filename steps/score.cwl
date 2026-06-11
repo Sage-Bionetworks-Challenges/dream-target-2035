@@ -33,7 +33,7 @@ outputs:
 baseCommand: /usr/local/bin/score.py
 arguments:
 - prefix: -p
-  valueFrom: $(inputs.input_file)
+  valueFrom: $(inputs.input_file.path)
 - prefix: -g
   valueFrom: $(inputs.groundtruth.path)
 - prefix: -r
@@ -45,7 +45,7 @@ arguments:
 
 hints:
   DockerRequirement:
-    dockerPull: docker.synapse.org/syn65660836/evaluation:v2.0.0
+    dockerPull: docker.synapse.org/syn65660836/evaluation:v2.1.0
 
 s:author:
 - class: s:Person
