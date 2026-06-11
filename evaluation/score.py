@@ -99,8 +99,9 @@ def main(
             scores = score_task2(evaluator, hits, catalog_ids, scores_col)
 
         # Handle edge-case when ROC-AUC and PRAUC cannot be calculated and returns `nan`.
+        # Also, replace spaces and hyphens in metric names with underscores to make Synapse happy.
         scores = {
-            metric: (None if pd.isnull(score) else score)
+            metric.replace(" ", "_").replace("-", "_"): (None if pd.isnull(score) else score)
             for metric, score in scores.items()
         }
     except KeyError as e:
