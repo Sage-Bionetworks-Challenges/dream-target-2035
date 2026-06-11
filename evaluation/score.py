@@ -87,6 +87,8 @@ def main(
     ] = 1,
 ):
     """Main function."""
+    errors = ""
+    try:
         evaluator = Evaluator(reference_file, groundtruth_file)
 
         if task_number == 1:
@@ -101,6 +103,9 @@ def main(
             metric: (None if pd.isnull(score) else score)
             for metric, score in scores.items()
         }
+    except KeyError as e:
+        scores = {}
+        errors = f"Missing required column in predictions file: {e}. Expected columns: CatalogID, Sel_50, Score"
     except ValueError:
         scores = {}
         errors = "Error encountered during scoring; submission not evaluated."
