@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 python:3.12.9-slim-bullseye
+FROM python:3.12.9-slim-bullseye
 
 # Set default working directory.
 WORKDIR /usr/local/bin
