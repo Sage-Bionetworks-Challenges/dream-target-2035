@@ -33,7 +33,7 @@ expression: |2-
       };
     } 
     // Step 2
-    else if (inputs.queue in ["9619687", "9619686"]) {
+    else if (["9619687", "9619686"].includes(inputs.queue)) {
       return {
         gt_synid: "syn75383335",
         ref_synid: "syn75383337",
