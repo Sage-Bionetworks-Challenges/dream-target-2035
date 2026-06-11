@@ -26,10 +26,10 @@ inputs:
     label: User or team ID for challenge organizers
     type: string
     default: "3535713"
-  private_annotations:
-    label: List of annotation keys to set as private (not visible to submitters)
-    type: string[]
-    default: ["submission_errors"]
+  # private_annotations:
+  #   label: List of annotation keys to set as private (not visible to submitters)
+  #   type: string[]
+  #   default: ["submission_errors"]
 
 outputs: []
 
@@ -190,8 +190,7 @@ steps:
       
   10_send_score_results:
     doc: Send email of the scores to the submitter
-    run: |-
-      https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v4.1/cwl/score_email.cwl
+    run: steps/email_score.cwl
     in:
       - id: submissionid
         source: "#submissionId"
@@ -199,8 +198,8 @@ steps:
         source: "#synapseConfig"
       - id: results
         source: "#09_score/results"
-      - id: private_annotations
-        source: "#private_annotations"
+      # - id: private_annotations
+      #   source: "#private_annotations"
     out: []
 
   11_add_score_annots:
