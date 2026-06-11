@@ -65,31 +65,7 @@ def main(
     ] = 1,
 ):
     """Main function."""
-
-    if task_number == 1:
-        with open(predictions_file, "r") as pred:
-            hits = pred.read().splitlines()
-    else:
-        pred = pd.read_csv(
-            predictions_file,
-            usecols=PREDICTION_COLS.get(task_number),
-            float_precision="round_trip",
-        )
-        hits = pred.query("Sel_50 == 1")["CatalogID"].to_list()
-
-    try:
-        scores = {}
-        errors = ""
-
-        evaluator = Evaluator(groundtruth_file, reference_file)
-        scores = evaluator.evaluate_hits(hits)
-
-        if task_number == 2:
-            ranking = evaluator.evaluate_ranking(
-                pred.CatalogID.to_list(),
-                pred.Score.to_list(),
-            )
-            # TODO: confirm with Luca what to do next
+        evaluator = Evaluator(reference_file, groundtruth_file)
 
         # Handle edge-case when ROC-AUC and PRAUC cannot be calculated and returns `nan`.
         scores = {
