@@ -8,9 +8,10 @@ Steps 1 and 2 will return the same metrics:
     - AUROC
     - AUC-PR
 """
+
 import json
 
-import evaluation_function
+from evaluation import Evaluator
 import pandas as pd
 import typer
 from typing_extensions import Annotated
@@ -38,6 +39,14 @@ def main(
             help="Path to the groundtruth file.",
         ),
     ],
+    reference_file: Annotated[
+        str,
+        typer.Option(
+            "-r",
+            "--reference_file",
+            help="Path to the reference file.",
+        ),
+    ],
     output_file: Annotated[
         str,
         typer.Option(
@@ -57,22 +66,30 @@ def main(
 ):
     """Main function."""
 
-    pred = pd.read_csv(
-        predictions_file,
-        usecols=PREDICTION_COLS.get(task_number),
-        float_precision="round_trip",
-    ).fillna({"Score": 0.0, "Sel_200": 0, "Sel_500": 0, "Sel_50": 0})
-    truth = pd.read_csv(groundtruth_file)
+    if task_number == 1:
+        with open(predictions_file, "r") as pred:
+            hits = pred.read().splitlines()
+    else:
+        pred = pd.read_csv(
+            predictions_file,
+            usecols=PREDICTION_COLS.get(task_number),
+            float_precision="round_trip",
+        )
+        hits = pred.query("Sel_50 == 1")["CatalogID"].to_list()
 
     try:
         scores = {}
         errors = ""
-        if task_number == 1:
-            scores = evaluation_function.evaluate_team_model(truth, pred)
-        elif task_number == 2:
-            scores = evaluation_function.evaluate_team_model(
-                truth, pred, labels_team=["Sel_50"]
+
+        evaluator = Evaluator(groundtruth_file, reference_file)
+        scores = evaluator.evaluate_hits(hits)
+
+        if task_number == 2:
+            ranking = evaluator.evaluate_ranking(
+                pred.CatalogID.to_list(),
+                pred.Score.to_list(),
             )
+            # TODO: confirm with Luca what to do next
 
         # Handle edge-case when ROC-AUC and PRAUC cannot be calculated and returns `nan`.
         scores = {
