@@ -11,6 +11,8 @@ inputs:
   type: File
 - id: groundtruth
   type: File
+- id: reference
+  type: File
 - id: task_number
   type: int
 - id: check_validation_finished
@@ -34,6 +36,8 @@ arguments:
   valueFrom: $(inputs.input_file)
 - prefix: -g
   valueFrom: $(inputs.groundtruth.path)
+- prefix: -r
+  valueFrom: $(inputs.reference.path)
 - prefix: -o
   valueFrom: results.json
 - prefix: -t
