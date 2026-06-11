@@ -11,8 +11,7 @@ RUN pip install \
     -r requirements.txt
 
 # Copy over validation and scoring scripts.
-COPY evaluation_function.py .
-COPY validate.py .
+COPY evaluation.py .
 COPY score.py .
 
 ENTRYPOINT [ "python" ]
