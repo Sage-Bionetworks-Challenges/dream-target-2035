@@ -219,8 +219,8 @@ steps:
         default: true
       - id: synapse_config
         source: "#synapseConfig"
-      - id: previous_annotation_finished
-        source: "#07_add_status_annots/finished"
+      # - id: previous_annotation_finished
+      #   source: "#07_add_status_annots/finished"
     out: [finished]
  
 s:author:
