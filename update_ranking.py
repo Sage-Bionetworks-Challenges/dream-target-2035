@@ -13,14 +13,15 @@ Target 2035 Challenge according to the following criteria:
     3. PR_AUC — higher is better
     4. ROC_AUC — higher is better
 """
-import cnb_tools
+
 import pandas as pd
-from synapseclient.models import SubmissionView
+from synapseclient import Synapse
+from synapseclient.models import SubmissionStatus, SubmissionView
 
 SUBMISSION_VIEW_ID = "syn75352539"
 
 QUEUES = {
-    "Blind validation":  {
+    "Blind validation": {
         "id": "9619685",
         "sort_cols": ["N_clusters", "N_hits"],
     },
@@ -37,7 +38,7 @@ QUEUES = {
 
 def get_scored_submissions(view_id, queue_id, sort_cols):
     """Get scored submissions for a given queue.
-    
+
     For any submissions with 0 hits, default N_clusters to 0.
     """
     cols = ", ".join(["id", "rank"] + sort_cols)
@@ -55,7 +56,7 @@ def get_scored_submissions(view_id, queue_id, sort_cols):
 def compute_ranks(df, sort_cols):
     """
     Rank submissions according to the specified sort columns.
-    
+
     To help speed up annotations, the existing rank is temporarily
     saved to compare with later.
     """
@@ -79,13 +80,16 @@ def annotate_submissions(df):
         if pd.notna(old_rank) and int(old_rank) == new_rank:
             skipped += 1
             continue
-        cnb_tools.update_annotations(row["id"], {"rank": new_rank})
+        status = SubmissionStatus(id=str(int(row["id"]))).get()
+        status.submission_annotations["rank"] = [new_rank]
+        status.store()
     return skipped
 
 
 def main():
     """Main function."""
-    cnb_tools.get_synapse_client()  # initialize client from SYNAPSE_AUTH_TOKEN
+    syn = Synapse()
+    syn.login(silent=True)
     for task, config in QUEUES.items():
         df = get_scored_submissions(
             SUBMISSION_VIEW_ID, config["id"], config["sort_cols"]
@@ -96,7 +100,9 @@ def main():
         df = compute_ranks(df, config["sort_cols"])
         skipped = annotate_submissions(df)
         updated = len(df) - skipped
-        print(f"{task}: ranked {len(df)} submissions ({updated} updated, {skipped} unchanged) ✓")
+        print(
+            f"{task}: ranked {len(df)} submissions ({updated} updated, {skipped} unchanged) ✓"
+        )
 
 
 if __name__ == "__main__":
