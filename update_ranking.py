@@ -85,6 +85,7 @@ def annotate_submissions(df):
 
 def main():
     """Main function."""
+    cnb_tools.get_synapse_client()  # initialize client from SYNAPSE_AUTH_TOKEN
     for task, config in QUEUES.items():
         df = get_scored_submissions(
             SUBMISSION_VIEW_ID, config["id"], config["sort_cols"]
