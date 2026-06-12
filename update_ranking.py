@@ -16,7 +16,7 @@ Target 2035 Challenge according to the following criteria:
 
 import pandas as pd
 from synapseclient import Synapse
-from synapseclient.models import SubmissionStatus, SubmissionView
+from synapseclient.models import SubmissionView
 
 SUBMISSION_VIEW_ID = "syn75352539"
 
@@ -70,7 +70,7 @@ def compute_ranks(df, sort_cols):
     return df
 
 
-def annotate_submissions(df):
+def annotate_submissions(df, syn):
     """Annotate each submission with its rank, skipping unchanged ranks."""
     skipped = 0
     for _, row in df.iterrows():
@@ -80,9 +80,9 @@ def annotate_submissions(df):
         if pd.notna(old_rank) and int(old_rank) == new_rank:
             skipped += 1
             continue
-        status = SubmissionStatus(id=str(int(row["id"]))).get()
-        status.submission_annotations["rank"] = [new_rank]
-        status.store()
+        sub_status = syn.getSubmissionStatus(str(int(row["id"])))
+        sub_status.submissionAnnotations["rank"] = new_rank
+        syn.store(sub_status)
     return skipped
 
 
@@ -98,7 +98,7 @@ def main():
             print(f"{task}: no scored submissions, skipping.")
             continue
         df = compute_ranks(df, config["sort_cols"])
-        skipped = annotate_submissions(df)
+        skipped = annotate_submissions(df, syn)
         updated = len(df) - skipped
         print(
             f"{task}: ranked {len(df)} submissions ({updated} updated, {skipped} unchanged) ✓"
