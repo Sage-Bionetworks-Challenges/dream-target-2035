@@ -15,7 +15,9 @@ Target 2035 Challenge according to the following criteria:
 """
 
 import pandas as pd
-from synapseclient import Synapse
+import synapseclient
+from challengeutils.annotations import update_submission_status
+from challengeutils.utils import update_single_submission_status
 from synapseclient.models import SubmissionView
 
 SUBMISSION_VIEW_ID = "syn75352539"
@@ -80,15 +82,17 @@ def annotate_submissions(df, syn):
         if pd.notna(old_rank) and int(old_rank) == new_rank:
             skipped += 1
             continue
+        annots = {"rank": new_rank}
         sub_status = syn.getSubmissionStatus(str(int(row["id"])))
-        sub_status.submissionAnnotations["rank"] = new_rank
+        sub_status = update_single_submission_status(sub_status, annots, is_private=False)
+        sub_status = update_submission_status(sub_status, annots)
         syn.store(sub_status)
     return skipped
 
 
 def main():
     """Main function."""
-    syn = Synapse()
+    syn = synapseclient.Synapse()
     syn.login(silent=True)
     for task, config in QUEUES.items():
         df = get_scored_submissions(
