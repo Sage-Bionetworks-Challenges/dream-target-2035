@@ -69,21 +69,23 @@ class Evaluator:
         return [mol for mol in submission if mol in self.gold_dict]
 
     def _n_clusters(self, hits):
-        uf = UnionFind(hits)
-        for i in range(len(hits)):
-            for j in range(i + 1, len(hits)):
-                if set(self.gold_dict[hits[i]]) & set(self.gold_dict[hits[j]]):
-                    uf.union(hits[i], hits[j])
-        return len({uf.find(k) for k in hits})
+        clsts = [self.gold_dict[h] for h in hits]
+        sorted_clsts = sorted(clsts, key= lambda x: len(x))
+        unique_clsts = set()
+        counter = 0
+        for c in sorted_clsts:
+            if not any([ci in unique_clsts for ci in c]):
+                counter += 1
+            for ci in c:
+                unique_clsts.add(ci)
+        return counter
 
     def _cluster_hits_p(self, K, batch_size):
         clust_labels = np.concatenate(list(self.gold_dict.values()))
         n_clusters = len(set(clust_labels))
-        print(n_clusters)
         probs = np.stack(
             [(clust_labels == p).sum()/self.library_size for p in set(clust_labels)]
             )
-        print(probs)
         p_hits = 1 - (1-probs)**batch_size
         if K < n_clusters/2:
             return 1-np.sum(
