@@ -7,8 +7,10 @@ requirements:
 - class: InlineJavascriptRequirement
 
 inputs:
+- id: entity_type
+  type: string
 - id: input_file
-  type: File
+  type: File?
 - id: groundtruth
   type: File
 - id: reference

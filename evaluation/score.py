@@ -45,6 +45,14 @@ def score_task2(
 
 
 def main(
+    entity_type: Annotated[
+        str,
+        typer.Option(
+            "-e",
+            "--entity_type",
+            help="Entity type of submission.",
+        ),
+    ],
     predictions_file: Annotated[
         str,
         typer.Option(
@@ -88,33 +96,37 @@ def main(
 ):
     """Main function."""
     errors = ""
-    try:
-        evaluator = Evaluator(reference_file, groundtruth_file)
-
-        if task_number == 1:
-            hits = load_task1(predictions_file)
-            scores = score_task1(evaluator, hits)
-        else:
-            hits, catalog_ids, scores_col = load_task2(predictions_file)
-            scores = score_task2(evaluator, hits, catalog_ids, scores_col)
-
-        # Handle edge-case when ROC-AUC and PRAUC cannot be calculated and returns `nan`.
-        # Also, replace spaces and hyphens in metric names with underscores to make Synapse happy.
-        scores = {
-            metric.replace(" ", "_").replace("-", "_"): (None if pd.isnull(score) else score)
-            for metric, score in scores.items()
-        }
-    except KeyError as e:
+    if entity_type != "FileEntity":
+        errors = f"Submission must be a File, not {entity_type}."
         scores = {}
-        errors = f"Missing required column in predictions file: {e}. Expected columns: CatalogID, Sel_50, Score"
-    except ValueError as e:
-        scores = {}
-        errors = str(e)
+    else:
+        try:
+            evaluator = Evaluator(reference_file, groundtruth_file)
+
+            if task_number == 1:
+                hits = load_task1(predictions_file)
+                scores = score_task1(evaluator, hits)
+            else:
+                hits, catalog_ids, scores_col = load_task2(predictions_file)
+                scores = score_task2(evaluator, hits, catalog_ids, scores_col)
+
+            # Handle edge-case when ROC-AUC and PRAUC cannot be calculated and returns `nan`.
+            # Also, replace spaces and hyphens in metric names with underscores to make Synapse happy.
+            scores = {
+                metric.replace(" ", "_").replace("-", "_"): (None if pd.isnull(score) else score)
+                for metric, score in scores.items()
+            }
+        except KeyError as e:
+            scores = {}
+            errors = f"Missing required column in predictions file: {e}. Expected columns: CatalogID, Sel_50, Score"
+        except ValueError as e:
+            scores = {}
+            errors = str(e)
 
     res = json.dumps(
         {
             "submission_status": "INVALID" if errors else "SCORED",
-            "submission_errors": errors[:500],
+            "submission_errors": errors[:496] + "..." if len(errors) > 500 else errors,
             **scores,
         }
     )

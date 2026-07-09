@@ -105,6 +105,8 @@ steps:
     doc: Score predictions file
     run: steps/score.cwl
     in:
+      - id: entity_type
+        source: "#02_download_submission/entity_type"
       - id: input_file
         source: "#02_download_submission/filepath"
       - id: groundtruth
