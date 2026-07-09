@@ -53,14 +53,6 @@ def main(
             help="Entity type of submission.",
         ),
     ],
-    predictions_file: Annotated[
-        str,
-        typer.Option(
-            "-p",
-            "--predictions_file",
-            help="Path to the prediction file.",
-        ),
-    ],
     groundtruth_file: Annotated[
         str,
         typer.Option(
@@ -77,6 +69,14 @@ def main(
             help="Path to the reference file.",
         ),
     ],
+    predictions_file: Annotated[
+        str,
+        typer.Option(
+            "-p",
+            "--predictions_file",
+            help="Path to the prediction file.",
+        ),
+    ] = "",
     output_file: Annotated[
         str,
         typer.Option(
@@ -84,7 +84,7 @@ def main(
             "--output_file",
             help="Path to save the results JSON file.",
         ),
-    ] = None,
+    ] = "",
     task_number: Annotated[
         int,
         typer.Option(
