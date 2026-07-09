@@ -34,6 +34,8 @@ outputs:
 
 baseCommand: /usr/local/bin/score.py
 arguments:
+- prefix: -e
+  valueFrom: $(inputs.entity_type)
 - prefix: -p
   valueFrom: $(inputs.input_file)
 - prefix: -g
