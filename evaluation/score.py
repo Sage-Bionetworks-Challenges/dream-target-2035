@@ -96,6 +96,7 @@ def main(
 ):
     """Main function."""
     errors = ""
+    entity_type = entity_type.split(".")[-1]
     if entity_type != "FileEntity":
         errors = f"Submission must be a File, not {entity_type}."
         scores = {}
