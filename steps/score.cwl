@@ -35,7 +35,7 @@ outputs:
 baseCommand: /usr/local/bin/score.py
 arguments:
 - prefix: -p
-  valueFrom: $(inputs.input_file.path)
+  valueFrom: $(inputs.input_file)
 - prefix: -g
   valueFrom: $(inputs.groundtruth.path)
 - prefix: -r
