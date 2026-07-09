@@ -114,7 +114,7 @@ def main(
     res = json.dumps(
         {
             "submission_status": "INVALID" if errors else "SCORED",
-            "submission_errors": errors,
+            "submission_errors": errors[:500],
             **scores,
         }
     )
